@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    app:bbn_badgeColor="#FFFF0000"
+    android:background="#FF18BC9A"
+    app:bbn_alwaysShowLabels="true">
+
+
+    <item
+        android:id="@+id/navigation_home"
+        android:icon="@drawable/ic_home_black_24dp"
+        android:title="@string/title_home" />
+
+    <item
+        android:id="@+id/navigation_dashboard"
+        android:icon="@drawable/ic_dashboard_black_24dp"
+        android:title="@string/title_dashboard" />
+
+    <item
+        android:id="@+id/navigation_notifications"
+        android:icon="@drawable/ic_notifications_black_24dp"
+        android:title="@string/title_notifications" />
+    <item
+        android:id="@+id/shade_recognition"
+        android:icon="@drawable/ic_notifications_black_24dp"
+        android:title="@string/title_notifications" />
+
+    <declare-styleable android:name="BottomNavigationMenu">
+        <!-- menu default background color -->
+        <attr android:name="android:background" />
+
+        <!-- default badge color -->
+        <attr android:name="bbn_badgeColor" android:format="color" />
+
+        <!-- animation duration for the menu items -->
+        <attr android:name="bbn_itemAnimationDuration" android:format="integer" />
+
+        <!-- ripple selector color -->
+        <attr android:name="bbn_rippleColor" android:format="color" />
+
+        <!-- menu item active color -->
+        <attr android:name="bbn_itemColorActive" android:format="color" />
+
+        <!-- menu item inactive color -->
+        <attr android:name="bbn_itemColorInactive" android:format="color" />
+
+        <!-- menu item disabled color -->
+        <attr android:name="bbn_itemColorDisabled" android:format="color" />
+
+        <!-- force fixed behavior and always display item labels -->
+        <!-- default implementation is false and the labels are -->
+        <!-- shown only if there are less than 4 items in the menu -->
+        <attr android:name="bbn_alwaysShowLabels" android:format="boolean" />
+    </declare-styleable>
+</menu>
