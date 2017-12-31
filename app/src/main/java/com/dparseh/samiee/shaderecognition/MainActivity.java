@@ -87,6 +87,13 @@ public class MainActivity extends Activity implements BottomNavigation.OnMenuIte
                 int xPos = markerPosXY[0] - posXY[0];
                 int yPos = markerPosXY[1] - posXY[1];
 
+
+
+//                ViewGroup frame = findViewById(R.id.frameLayout);
+//                FrameLayout.LayoutParams frameParams = new FrameLayout.LayoutParams( frame.getLayoutParams());
+//                xPos = frameParams.leftMargin;
+//                yPos = frameParams.topMargin;
+
                 Log.e("markerLayoutPosx: ", posXY[0]+"");
                 Log.e("markerLayoutPosy: ", posXY[1]+"");
                 Log.e("markerPosx: ", markerPosXY[0]+"");
@@ -202,8 +209,9 @@ public class MainActivity extends Activity implements BottomNavigation.OnMenuIte
         greenValue = Color.green(color);
 
         Log.e("redValue", redValue+"");
-        Log.e("blueValue", blueValue+"");
         Log.e("greenValue", greenValue+"");
+        Log.e("blueValue", blueValue+"");
+
         Log.e("width", bitmap.getWidth()+"");
         Log.e("height", bitmap.getHeight()+"");
 
@@ -228,7 +236,7 @@ public class MainActivity extends Activity implements BottomNavigation.OnMenuIte
         Log.e("width & height", width+" & " + height);
         Log.e("bitmap width", bitmap.getWidth()+"");
         Log.e("bitmap height", bitmap.getHeight()+"");
-        bitmap.getPixels(pixels, 0, -1, xPos, yPos, width, height);
+        bitmap.getPixels(pixels, 0, width, xPos, yPos, width, height);
 //        Log.e("ColorSpace", "CS: "+bitmap.getColorSpace()+"");
         if (null == bitmap) return Color.TRANSPARENT;
 
