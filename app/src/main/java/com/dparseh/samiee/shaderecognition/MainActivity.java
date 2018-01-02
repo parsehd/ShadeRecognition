@@ -100,6 +100,7 @@ public class MainActivity extends Activity implements BottomNavigation.OnMenuIte
                 Log.e("markerPosy: ", markerPosXY[1]+"");
 
 
+
                 printLab(xPos, yPos);
 
 //                float[] color = new float[3];
