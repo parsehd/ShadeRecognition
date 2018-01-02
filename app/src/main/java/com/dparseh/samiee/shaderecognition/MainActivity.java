@@ -101,6 +101,13 @@ public class MainActivity extends Activity implements BottomNavigation.OnMenuIte
 
                 printLab(xPos, yPos);
 
+//                float[] color = new float[3];
+//                int rgb = image.getRGB(e.getX(),e.getY());
+//                ColorHsv.rgbToHsv((rgb >> 16) & 0xFF, (rgb >> 8) & 0xFF, rgb & 0xFF, color);
+//                System.out.println("H = " + color[0]+" S = "+color[1]+" V = "+color[2]);
+//
+//                showSelectedColor("Selected",image,color[0],color[1]);
+
 
             }
         });
