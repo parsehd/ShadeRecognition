@@ -1,24 +1,16 @@
 package com.dparseh.samiee.shaderecognition;
 
-import android.animation.ValueAnimator;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.Rect;
-import android.graphics.Typeface;
 import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.constraint.solver.widgets.Rectangle;
 import android.util.Log;
-import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.Button;
@@ -26,9 +18,12 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import it.sephiroth.android.library.bottomnavigation.BadgeProvider;
+import boofcv.alg.color.ColorHsv;
+import boofcv.android.ConvertBitmap;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.Planar;
+import georegression.metric.UtilAngle;
 import it.sephiroth.android.library.bottomnavigation.BottomNavigation;
 
 public class MainActivity extends Activity implements BottomNavigation.OnMenuItemSelectionListener{
@@ -72,6 +67,43 @@ public class MainActivity extends Activity implements BottomNavigation.OnMenuIte
         markerLayout =  (RelativeLayout) findViewById(R.id.markerLayout);
         marker = (ImageView) findViewById(R.id.marker);
         smilePicView = findViewById(R.id.SmilePic);
+        final Bitmap bitmap = ((BitmapDrawable)smilePicView.getDrawable()).getBitmap();
+        smilePicView.setOnTouchListener(new View.OnTouchListener(){
+            @Override
+            public boolean onTouch(View v, MotionEvent event){
+                int x = (int)event.getX();
+                int y = (int)event.getY();
+                int pixel = bitmap.getPixel(x,y);
+
+                //then do what you want with the pixel data, e.g
+                int redValue = Color.red(pixel);
+                int blueValue = Color.blue(pixel);
+                int greenValue = Color.green(pixel);
+
+
+                float[] hslColor = new float[3];
+
+                Color.RGBToHSV(redValue, greenValue, blueValue, hslColor);
+
+
+
+                showSelectedColor("Selected",bitmap,hslColor[0],hslColor[1]);
+
+                Log.e("redValue", redValue+"");
+                Log.e("greenValue", greenValue+"");
+                Log.e("blueValue", blueValue+"");
+
+
+
+
+
+                return false;
+            }
+        });
+
+
+
+
         marker.setOnTouchListener(onMarkerTouchListener());
 
         detectButton = findViewById(R.id.detectButton);
@@ -103,12 +135,7 @@ public class MainActivity extends Activity implements BottomNavigation.OnMenuIte
 
                 printLab(xPos, yPos);
 
-//                float[] color = new float[3];
-//                int rgb = image.getRGB(e.getX(),e.getY());
-//                ColorHsv.rgbToHsv((rgb >> 16) & 0xFF, (rgb >> 8) & 0xFF, rgb & 0xFF, color);
-//                System.out.println("H = " + color[0]+" S = "+color[1]+" V = "+color[2]);
-//
-//                showSelectedColor("Selected",image,color[0],color[1]);
+
 
 
             }
@@ -341,5 +368,53 @@ public class MainActivity extends Activity implements BottomNavigation.OnMenuIte
         lab[0] = (int) (2.55*Ls + .5);
         lab[1] = (int) (as + .5);
         lab[2] = (int) (bs + .5);
+    }
+
+    /**
+     * Selectively displays only pixels which have a similar hue and saturation values to what is provided.
+     * This is intended to be a simple example of color based segmentation.  Color based segmentation can be done
+     * in RGB color, but is more problematic due to it not being intensity invariant.  More robust techniques
+     * can use Gaussian models instead of a uniform distribution, as is done below.
+     */
+    public void showSelectedColor( String name , Bitmap bitmap , float hue , float saturation ) {
+        Planar<GrayF32> input = ConvertBitmap.bitmapToMS(bitmap, null, GrayF32.class, null);
+        Planar<GrayF32> hsv = input.createSameShape();
+
+        // Convert into HSV
+        ColorHsv.rgbToHsv_F32(input,hsv);
+
+        // Euclidean distance squared threshold for deciding which pixels are members of the selected set
+        float maxDist2 = 0.4f*0.4f;
+
+        // Extract hue and saturation bands which are independent of intensity
+        GrayF32 H = hsv.getBand(0);
+        GrayF32 S = hsv.getBand(1);
+
+        // Adjust the relative importance of Hue and Saturation.
+        // Hue has a range of 0 to 2*PI and Saturation from 0 to 1.
+        float adjustUnits = (float)(Math.PI/2.0);
+
+        // step through each pixel and mark how close it is to the selected color
+        Bitmap outputBitmap = Bitmap.createBitmap(bitmap.getWidth(), bitmap.getHeight(), bitmap.getConfig());
+
+//        Bitmap.Config config = drawable.getOpacity() != PixelFormat.OPAQUE ? Bitmap.Config.ARGB_8888
+//                : Bitmap.Config.RGB_565;
+//        Bitmap bitmap = Bitmap.createBitmap(w, h, config);
+
+//        BufferedImage output = new BufferedImage(input.width,input.height,BufferedImage.TYPE_INT_RGB);
+        for( int y = 0; y < hsv.height; y++ ) {
+            for( int x = 0; x < hsv.width; x++ ) {
+                // Hue is an angle in radians, so simple subtraction doesn't work
+                float dh = UtilAngle.dist(H.unsafe_get(x,y),hue);
+                float ds = (S.unsafe_get(x,y)-saturation)*adjustUnits;
+
+                // this distance measure is a bit naive, but good enough for to demonstrate the concept
+                float dist2 = dh*dh + ds*ds;
+                if( dist2 <= maxDist2 ) {
+                    outputBitmap.setPixel(x,y,bitmap.getPixel(x, y));
+                }
+            }
+        }
+        smilePicView.setImageBitmap(outputBitmap);
     }
 }
