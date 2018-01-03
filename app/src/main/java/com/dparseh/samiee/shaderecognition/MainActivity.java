@@ -384,7 +384,7 @@ public class MainActivity extends Activity implements BottomNavigation.OnMenuIte
         ColorHsv.rgbToHsv_F32(input,hsv);
 
         // Euclidean distance squared threshold for deciding which pixels are members of the selected set
-        float maxDist2 = 0.4f*0.4f;
+        float  maxDist2 = 0.4f*0.4f;
 
         // Extract hue and saturation bands which are independent of intensity
         GrayF32 H = hsv.getBand(0);
@@ -400,7 +400,7 @@ public class MainActivity extends Activity implements BottomNavigation.OnMenuIte
 //        Bitmap.Config config = drawable.getOpacity() != PixelFormat.OPAQUE ? Bitmap.Config.ARGB_8888
 //                : Bitmap.Config.RGB_565;
 //        Bitmap bitmap = Bitmap.createBitmap(w, h, config);
-
+            int counter=0;
 //        BufferedImage output = new BufferedImage(input.width,input.height,BufferedImage.TYPE_INT_RGB);
         for( int y = 0; y < hsv.height; y++ ) {
             for( int x = 0; x < hsv.width; x++ ) {
@@ -412,9 +412,12 @@ public class MainActivity extends Activity implements BottomNavigation.OnMenuIte
                 float dist2 = dh*dh + ds*ds;
                 if( dist2 <= maxDist2 ) {
                     outputBitmap.setPixel(x,y,bitmap.getPixel(x, y));
+                    counter++;
                 }
             }
         }
+        Log.e("set pixel", counter+"");
+
         smilePicView.setImageBitmap(outputBitmap);
     }
 }
