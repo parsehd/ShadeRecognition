@@ -211,7 +211,7 @@ public class MainActivity extends Activity implements BottomNavigation.OnMenuIte
                         view.setLayoutParams(layoutParams);
                         break;
 
-                }
+                };
 
                 markerLayout.invalidate();
                 return true;
@@ -412,6 +412,7 @@ public class MainActivity extends Activity implements BottomNavigation.OnMenuIte
                 float dist2 = dh*dh + ds*ds;
                 if( dist2 <= maxDist2 ) {
                     outputBitmap.setPixel(x,y,bitmap.getPixel(x, y));
+
                     counter++;
                 }
             }
@@ -421,3 +422,4 @@ public class MainActivity extends Activity implements BottomNavigation.OnMenuIte
         smilePicView.setImageBitmap(outputBitmap);
     }
 }
+
