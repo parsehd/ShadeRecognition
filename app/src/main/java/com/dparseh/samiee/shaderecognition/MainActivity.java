@@ -8,6 +8,7 @@ import android.graphics.Rect;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.util.Log;
+import android.util.LogPrinter;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -41,6 +42,7 @@ public class MainActivity extends Activity implements BottomNavigation.OnMenuIte
 
     private int xDelta;
     private int yDelta;
+    private int receiverVisibleToInstantApps;
 
 
     @Override
@@ -68,40 +70,38 @@ public class MainActivity extends Activity implements BottomNavigation.OnMenuIte
         marker = (ImageView) findViewById(R.id.marker);
         smilePicView = findViewById(R.id.SmilePic);
         final Bitmap bitmap = ((BitmapDrawable)smilePicView.getDrawable()).getBitmap();
-        smilePicView.setOnTouchListener(new View.OnTouchListener(){
-            @Override
-            public boolean onTouch(View v, MotionEvent event){
-                int x = (int)event.getX();
-                int y = (int)event.getY();
-                int pixel = bitmap.getPixel(x,y);
-
-                //then do what you want with the pixel data, e.g
-                int redValue = Color.red(pixel);
-                int blueValue = Color.blue(pixel);
-                int greenValue = Color.green(pixel);
-
-
-                float[] hslColor = new float[3];
-
-                Color.RGBToHSV(redValue, greenValue, blueValue, hslColor);
-
-
-
-                showSelectedColor("Selected",bitmap,hslColor[0],hslColor[1]);
-
-                Log.e("redValue", redValue+"");
-                Log.e("greenValue", greenValue+"");
-                Log.e("blueValue", blueValue+"");
-
-
-
-
-
-                return false;
-            }
-        });
-
-
+//        smilePicView.setOnTouchListener(new View.OnTouchListener(){
+//            @Override
+//            public boolean onTouch(View v, MotionEvent event){
+//                int x = (int)event.getX();
+//                int y = (int)event.getY();
+//                int pixel = bitmap.getPixel(x,y);
+//
+//                //then do what you want with the pixel data, e.g
+//                int redValue = Color.red(pixel);
+//                int blueValue = Color.blue(pixel);
+//                int greenValue = Color.green(pixel);
+//
+//
+//                float[] hslColor = new float[3];
+//
+//                Color.RGBToHSV(redValue, greenValue, blueValue, hslColor);
+//
+//
+//
+//                showSelectedColor("Selected",bitmap,hslColor[0],hslColor[1]);
+//
+//                Log.e("redValue", redValue+"");
+//                Log.e("greenValue", greenValue+"");
+//                Log.e("blueValue", blueValue+"");
+//
+//\
+//
+//
+//
+//                return false;
+//            }
+//        });
 
 
         marker.setOnTouchListener(onMarkerTouchListener());
@@ -131,12 +131,7 @@ public class MainActivity extends Activity implements BottomNavigation.OnMenuIte
                 Log.e("markerPosx: ", markerPosXY[0]+"");
                 Log.e("markerPosy: ", markerPosXY[1]+"");
 
-
-
                 printLab(xPos, yPos);
-
-
-
 
             }
         });
@@ -211,10 +206,10 @@ public class MainActivity extends Activity implements BottomNavigation.OnMenuIte
                         view.setLayoutParams(layoutParams);
                         break;
 
-                };
-
+                }
                 markerLayout.invalidate();
                 return true;
+
             }
         };
     }
@@ -251,7 +246,6 @@ public class MainActivity extends Activity implements BottomNavigation.OnMenuIte
         Log.e("width", bitmap.getWidth()+"");
         Log.e("height", bitmap.getHeight()+"");
 
-
         int[] lab = {0, 0, 0};
         rgb2lab(redValue, greenValue, blueValue, lab);
 
@@ -260,12 +254,13 @@ public class MainActivity extends Activity implements BottomNavigation.OnMenuIte
         marker.startAnimation(animFadeIn);
         textView.setText("L: "+lab[0] +" a:"+lab[1]+" b:"+lab[2]);
     }
+
     public int calculateDominantColor(Bitmap bitmap, int xPos, int yPos, int pixelSpacing) {
 
         Rect rect = marker.getDrawable().getBounds();
+
         int width = rect.width();
         int height = rect.height();
-
 
         int[] pixels = new int[width * height];
         Log.e("location", "Location is: " + xPos + " , "+ yPos);
@@ -316,6 +311,7 @@ public class MainActivity extends Activity implements BottomNavigation.OnMenuIte
         float Zr = 0.825211f;
 
         // RGB to XYZ
+
         r = R/255.f; //R 0..1
         g = G/255.f; //G 0..1
         b = B/255.f; //B 0..1
@@ -386,6 +382,7 @@ public class MainActivity extends Activity implements BottomNavigation.OnMenuIte
         // Euclidean distance squared threshold for deciding which pixels are members of the selected set
         float  maxDist2 = 0.4f*0.4f;
 
+
         // Extract hue and saturation bands which are independent of intensity
         GrayF32 H = hsv.getBand(0);
         GrayF32 S = hsv.getBand(1);
@@ -397,6 +394,8 @@ public class MainActivity extends Activity implements BottomNavigation.OnMenuIte
         // step through each pixel and mark how close it is to the selected color
         Bitmap outputBitmap = Bitmap.createBitmap(bitmap.getWidth(), bitmap.getHeight(), bitmap.getConfig());
 
+
+
 //        Bitmap.Config config = drawable.getOpacity() != PixelFormat.OPAQUE ? Bitmap.Config.ARGB_8888
 //                : Bitmap.Config.RGB_565;
 //        Bitmap bitmap = Bitmap.createBitmap(w, h, config);
@@ -406,20 +405,22 @@ public class MainActivity extends Activity implements BottomNavigation.OnMenuIte
             for( int x = 0; x < hsv.width; x++ ) {
                 // Hue is an angle in radians, so simple subtraction doesn't work
                 float dh = UtilAngle.dist(H.unsafe_get(x,y),hue);
-                float ds = (S.unsafe_get(x,y)-saturation)*adjustUnits;
+                float ds = (S.unsafe_get(x,y)- saturation)*adjustUnits;
 
                 // this distance measure is a bit naive, but good enough for to demonstrate the concept
                 float dist2 = dh*dh + ds*ds;
                 if( dist2 <= maxDist2 ) {
                     outputBitmap.setPixel(x,y,bitmap.getPixel(x, y));
-
                     counter++;
                 }
             }
         }
+
         Log.e("set pixel", counter+"");
 
         smilePicView.setImageBitmap(outputBitmap);
+
+
     }
 }
 
